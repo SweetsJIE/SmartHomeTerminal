@@ -34,6 +34,19 @@
         android:textSize="25sp"
         android:textStyle="bold" />
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+
+    <TextView
+        android:id="@+id/monitorTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="环境监测"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
     <Button
         android:id="@+id/button"
         android:layout_width="match_parent"

@@ -35,6 +35,9 @@ import java.net.UnknownHostException;
 
 import static java.lang.Thread.sleep;
 
+
+//天气api    https://restapi.amap.com/v3/weather/weatherInfo?key=0952ef14a2bac9fcdfab732cf9f8bc48&city=440113&extensions=base
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     //控件
@@ -73,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FragmentManager fragmentManager;
     private WelcomeFragment welcomeFragment;
     private LedFragment ledFragment;
+    private MonitorFragment monitorFragment;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -102,14 +106,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //fragment管理器初始化
         fragmentManager = getSupportFragmentManager();
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//                //dialog.show();
-//            }
-//        });
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setTabSelection(Location.MAIN.ordinal());
+            }
+        });
 
         ip = settingView.findViewById(R.id.ip);
         inputRomotePort = settingView.findViewById(R.id.targetPort);
@@ -118,6 +121,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         show = settingView.findViewById(R.id.show);
         menuBt = findViewById(R.id.menuBt);
         settingsBt = findViewById(R.id.settingsBt);
+
+
+//        aboutFragment = new AboutFragment();
+//        welcomeFragment = new WelcomeFragment();
+//        ledFragment = new LedFragment();
+//        monitorFragment = new MonitorFragment();
+
 
 
         setTabSelection(Location.MAIN.ordinal());
@@ -241,6 +251,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     socket_UDP.close(); //必须及时关闭 socket，否则会出现 error
                     socket_UDP = null;
 
+
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.d(TAG, "receive error");
@@ -292,13 +304,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void run() {
             //更新界面
             show.setText(result);
+            //监测温湿度数据变化   temperature:30:humidity:90
+            if(result.contains("temperature") && result.contains("humidity"))
+            {
+                String[]  strs=result.split(":");
+                monitorFragment.setTemperatureTv(strs[1]);
+                monitorFragment.setHumidityTv(strs[3]);
+            }
         }
     };
 
 
 
     protected void initPopupWindow(){
-        View popupWindowView = getLayoutInflater().inflate(R.layout.left_menu, null);
+        final View popupWindowView = getLayoutInflater().inflate(R.layout.left_menu, null);
         //内容，高度，宽度
 //        if(Location.BOTTOM.ordinal() == from){
 //            popupWindow = new PopupWindow(popupWindowView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
@@ -342,6 +361,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         TextView about = popupWindowView.findViewById(R.id.aboutTv);
         TextView led = popupWindowView.findViewById(R.id.ledTv);
+        TextView monitor = popupWindowView.findViewById(R.id.monitorTv);
 
         about.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -354,6 +374,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 setTabSelection(Location.LED.ordinal());
+                popupWindow.dismiss();
+            }
+        });
+        monitor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTabSelection(Location.MONITOR.ordinal());
                 popupWindow.dismiss();
             }
         });
@@ -437,6 +464,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     transaction.show(ledFragment);
                 }
                 break;
+            case 4:
+                if (monitorFragment == null) {
+                    // 如果MessageFragment为空，则创建一个并添加到界面上
+                    monitorFragment = new MonitorFragment();
+                    transaction.add(R.id.fragmentLayout, monitorFragment);
+                } else {
+                    // 如果MessageFragment不为空，则直接将它显示出来
+                    transaction.show(monitorFragment);
+                }
+                break;
         }
         transaction.commit();
     }
@@ -474,8 +511,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MAIN,
         ABOUT,
         LED,
-        SOCKET;
-
+        MONITOR;
     }
 
     /**
@@ -493,6 +529,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if (ledFragment != null) {
             transaction.hide(ledFragment);
+        }
+        if (monitorFragment != null) {
+            transaction.hide(monitorFragment);
         }
 //        if (settingFragment != null) {
 //            transaction.hide(settingFragment);
