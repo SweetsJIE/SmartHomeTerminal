@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView    aboutTv;
 
 
-    private String result = "";
+    public String result = "";
     private PopupWindow popupWindow;
     private int from = 0;
 
