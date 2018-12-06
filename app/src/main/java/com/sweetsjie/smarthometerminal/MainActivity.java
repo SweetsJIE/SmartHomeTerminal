@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AboutFragment aboutFragment;
     private FragmentManager fragmentManager;
     private WelcomeFragment welcomeFragment;
+    private LedFragment ledFragment;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -96,19 +97,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dialog = builder.create();
         dialog.setView(settingView);
 //        dialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        aboutView = View.inflate(this,R.layout.fragment_about,null);
+//        aboutView = getLayoutInflater().inflate(R.layout.left_menu, null);
 
         //fragment管理器初始化
         fragmentManager = getSupportFragmentManager();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //dialog.show();
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                //dialog.show();
+//            }
+//        });
 
         ip = settingView.findViewById(R.id.ip);
         inputRomotePort = settingView.findViewById(R.id.targetPort);
@@ -119,10 +120,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         settingsBt = findViewById(R.id.settingsBt);
 
 
-        setTabSelection(0);
+        setTabSelection(Location.MAIN.ordinal());
 
-//        aboutTv= aboutView.findViewById(R.id.aboutTv);
-//
+
+//        aboutTv = aboutView.findViewById(R.id.aboutTv);
+//        aboutTv.setText("about");
+//        aboutTv.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(MainActivity.this,"ablou click",Toast.LENGTH_LONG).show();
+//            }
+//        });
 //        aboutTv.setOnClickListener(this);
 
 
@@ -131,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 from = Location.LEFT.ordinal();
-
                 initPopupWindow();
             }
 
@@ -207,8 +214,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                }
                 dialog.dismiss();
                 break;
-            case R.id.aboutTv:
-                setTabSelection(0);
+
         }
     }
 
@@ -294,11 +300,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void initPopupWindow(){
         View popupWindowView = getLayoutInflater().inflate(R.layout.left_menu, null);
         //内容，高度，宽度
-        if(Location.BOTTOM.ordinal() == from){
-            popupWindow = new PopupWindow(popupWindowView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        }else{
+//        if(Location.BOTTOM.ordinal() == from){
+//            popupWindow = new PopupWindow(popupWindowView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+//        }else{
             popupWindow = new PopupWindow(popupWindowView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.FILL_PARENT, true);
-        }
+//        }
         //动画效果
         if(Location.LEFT.ordinal() == from) {
             popupWindow.setAnimationStyle(R.style.AnimationLeftFade);
@@ -334,6 +340,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        TextView about = popupWindowView.findViewById(R.id.aboutTv);
+        TextView led = popupWindowView.findViewById(R.id.ledTv);
+
+        about.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTabSelection(Location.ABOUT.ordinal());
+                popupWindow.dismiss();
+            }
+        });
+        led.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTabSelection(Location.LED.ordinal());
+                popupWindow.dismiss();
+            }
+        });
+
+        //about.setText("about");
 //        Button open = (Button)popupWindowView.findViewById(R.id.open);
 //        Button save = (Button)popupWindowView.findViewById(R.id.save);
 //        Button close = (Button)popupWindowView.findViewById(R.id.close);
@@ -378,12 +403,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //clearSelection();
         // 开启一个Fragment事务
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        // 先隐藏掉所有的Fragment，以防止有多个Fragment显示在界面上的情况
-        //hideFragments(transaction);
-        switch (index) {
-            case 0:
-                //messageLayout.setBackgroundColor(0xff0000ff);
 
+        // 先隐藏掉所有的Fragment，以防止有多个Fragment显示在界面上的情况
+        hideFragments(transaction);
+        switch (index) {
+            case 1:
                 if (welcomeFragment == null) {
                     // 如果MessageFragment为空，则创建一个并添加到界面上
                     welcomeFragment = new WelcomeFragment();
@@ -393,9 +417,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     transaction.show(welcomeFragment);
                 }
                 break;
-            case 1:
-                //messageLayout.setBackgroundColor(0xff0000ff);
-
+            case 2:
                 if (aboutFragment == null) {
                     // 如果MessageFragment为空，则创建一个并添加到界面上
                     aboutFragment = new AboutFragment();
@@ -403,6 +425,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     // 如果MessageFragment不为空，则直接将它显示出来
                     transaction.show(aboutFragment);
+                }
+                break;
+            case 3:
+                if (ledFragment == null) {
+                    // 如果MessageFragment为空，则创建一个并添加到界面上
+                    ledFragment = new LedFragment();
+                    transaction.add(R.id.fragmentLayout, ledFragment);
+                } else {
+                    // 如果MessageFragment不为空，则直接将它显示出来
+                    transaction.show(ledFragment);
                 }
                 break;
         }
@@ -418,6 +450,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onDismiss() {
             backgroundAlpha(1f);
+            //setTabSelection(0);
         }
 
     }
@@ -437,13 +470,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      *
      */
     public enum Location {
-
         LEFT,
-        RIGHT,
-        TOP,
-        BOTTOM;
+        MAIN,
+        ABOUT,
+        LED,
+        SOCKET;
 
     }
+
+    /**
+     * 将所有的Fragment都置为隐藏状态。
+     *
+     * @param transaction
+     * 用于对Fragment执行操作的事务
+     */
+    private void hideFragments(FragmentTransaction transaction) {
+        if (aboutFragment != null) {
+            transaction.hide(aboutFragment);
+        }
+        if (welcomeFragment != null) {
+            transaction.hide(welcomeFragment);
+        }
+        if (ledFragment != null) {
+            transaction.hide(ledFragment);
+        }
+//        if (settingFragment != null) {
+//            transaction.hide(settingFragment);
+//        }
+    }
+
+    /**
+     * 清除掉所有的选中状态。
+     */
+    private void clearSelection() {
+//        aboutFragment.setBackgroundColor(0xffffffff);
+//        welcomeFragment.setBackgroundColor(0xffffffff);
+//        ledFragment.setBackgroundColor(0xffffffff);
+//        settingLayout.setBackgroundColor(0xffffffff);
+    }
+
+
+
 
 
 }

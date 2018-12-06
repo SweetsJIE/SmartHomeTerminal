@@ -25,6 +25,15 @@
         android:layout_height="wrap_content"
         app:srcCompat="@mipmap/bg_fengexian" />
 
+    <TextView
+        android:id="@+id/ledTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="灯"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
     <Button
         android:id="@+id/button"
         android:layout_width="match_parent"
