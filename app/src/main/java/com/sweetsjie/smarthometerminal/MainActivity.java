@@ -1,15 +1,23 @@
 package com.sweetsjie.smarthometerminal;
 
 import android.content.DialogInterface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -29,22 +37,27 @@ import static java.lang.Thread.sleep;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button connectBt;
-    private EditText ip;
-    private EditText inputRomotePort;
-    private EditText inputLocalPort;
-    private EditText input;
-    private TextView show;
+    //控件
+    private Button      connectBt;
+    private EditText    ip;
+    private EditText    inputRomotePort;
+    private EditText    inputLocalPort;
+    private EditText    input;
+    private TextView    show;
     private ImageButton settingsBt;
     private ImageButton menuBt;
+    private TextView    aboutTv;
 
 
     private String result = "";
+    private PopupWindow popupWindow;
+    private int from = 0;
 
     private Handler handler = null;
 
     private AlertDialog.Builder builder;
     private View settingView;
+    private View aboutView;
     AlertDialog dialog;
 
 
@@ -55,6 +68,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     DatagramSocket socket_UDP = null;  //UDP协议Socket
     DatagramPacket DP = null;  //UDP协议数据包
     public static String string = null;  //指令
+
+    private AboutFragment aboutFragment;
+    private FragmentManager fragmentManager;
+    private WelcomeFragment welcomeFragment;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -72,13 +89,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        setSupportActionBar(toolbar);
 
 
+        //窗口控件初始化
         builder = new AlertDialog.Builder(this);
         settingView = View.inflate(this,R.layout.layout_settings,null);
         builder.setCancelable(false);
         dialog = builder.create();
         dialog.setView(settingView);
 //        dialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        aboutView = View.inflate(this,R.layout.fragment_about,null);
 
+        //fragment管理器初始化
+        fragmentManager = getSupportFragmentManager();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -97,6 +118,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         menuBt = findViewById(R.id.menuBt);
         settingsBt = findViewById(R.id.settingsBt);
 
+
+        setTabSelection(0);
+
+//        aboutTv= aboutView.findViewById(R.id.aboutTv);
+//
+//        aboutTv.setOnClickListener(this);
+
+
+
+        menuBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                from = Location.LEFT.ordinal();
+
+                initPopupWindow();
+            }
+
+
+        });
         settingsBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,20 +165,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     /**
      * A native method that is implemented by the 'native-lib' native library,
@@ -166,6 +206,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                    }
 //                }
                 dialog.dismiss();
+                break;
+            case R.id.aboutTv:
+                setTabSelection(0);
         }
     }
 
@@ -246,6 +289,161 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
+
+
+    protected void initPopupWindow(){
+        View popupWindowView = getLayoutInflater().inflate(R.layout.left_menu, null);
+        //内容，高度，宽度
+        if(Location.BOTTOM.ordinal() == from){
+            popupWindow = new PopupWindow(popupWindowView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        }else{
+            popupWindow = new PopupWindow(popupWindowView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.FILL_PARENT, true);
+        }
+        //动画效果
+        if(Location.LEFT.ordinal() == from) {
+            popupWindow.setAnimationStyle(R.style.AnimationLeftFade);
+        }
+        //菜单背景色
+        ColorDrawable dw = new ColorDrawable(0xffffffff);
+        popupWindow.setBackgroundDrawable(dw);
+        //宽度
+        popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+        //高度
+        //popupWindow.setHeight(LayoutParams.FILL_PARENT);
+        //显示位置
+        if(Location.LEFT.ordinal() == from){
+            popupWindow.showAtLocation(getLayoutInflater().inflate(R.layout.activity_main, null), Gravity.LEFT, 0, 2000);
+        }
+
+        //设置背景半透明
+        backgroundAlpha(0.5f);
+        //关闭事件
+        popupWindow.setOnDismissListener(new popupDismissListener());
+
+        popupWindowView.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+				/*if( popupWindow!=null && popupWindow.isShowing()){
+					popupWindow.dismiss();
+					popupWindow=null;
+				}*/
+                // 这里如果返回true的话，touch事件将被拦截
+                // 拦截后 PopupWindow的onTouchEvent不被调用，这样点击外部区域无法dismiss
+                return false;
+            }
+        });
+
+//        Button open = (Button)popupWindowView.findViewById(R.id.open);
+//        Button save = (Button)popupWindowView.findViewById(R.id.save);
+//        Button close = (Button)popupWindowView.findViewById(R.id.close);
+
+//
+//        open.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(context, "Open", Toast.LENGTH_LONG).show();
+//                popupWindow.dismiss();
+//            }
+//        });
+//
+//        save.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(context, "Open", Toast.LENGTH_LONG).show();
+//                popupWindow.dismiss();
+//            }
+//        });
+//
+//        close.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(context, "Open", Toast.LENGTH_LONG).show();
+//                popupWindow.dismiss();
+//            }
+//        });
+    }
+
+    /**
+     * 根据传入的index参数来设置选中的tab页。
+     *
+     * @param index
+     * 每个tab页对应的下标。0表示消息，1表示联系人，2表示动态，3表示设置。
+     */
+    private void setTabSelection(int index) {
+        // 每次选中之前先清楚掉上次的选中状态
+        //clearSelection();
+        // 开启一个Fragment事务
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        // 先隐藏掉所有的Fragment，以防止有多个Fragment显示在界面上的情况
+        //hideFragments(transaction);
+        switch (index) {
+            case 0:
+                //messageLayout.setBackgroundColor(0xff0000ff);
+
+                if (welcomeFragment == null) {
+                    // 如果MessageFragment为空，则创建一个并添加到界面上
+                    welcomeFragment = new WelcomeFragment();
+                    transaction.add(R.id.fragmentLayout, welcomeFragment);
+                } else {
+                    // 如果MessageFragment不为空，则直接将它显示出来
+                    transaction.show(welcomeFragment);
+                }
+                break;
+            case 1:
+                //messageLayout.setBackgroundColor(0xff0000ff);
+
+                if (aboutFragment == null) {
+                    // 如果MessageFragment为空，则创建一个并添加到界面上
+                    aboutFragment = new AboutFragment();
+                    transaction.add(R.id.fragmentLayout, aboutFragment);
+                } else {
+                    // 如果MessageFragment不为空，则直接将它显示出来
+                    transaction.show(aboutFragment);
+                }
+                break;
+        }
+        transaction.commit();
+    }
+
+    /**
+     * 添加新笔记时弹出的popWin关闭的事件，主要是为了将背景透明度改回来
+     *
+     */
+    class popupDismissListener implements PopupWindow.OnDismissListener{
+
+        @Override
+        public void onDismiss() {
+            backgroundAlpha(1f);
+        }
+
+    }
+
+    /**
+     * 设置添加屏幕的背景透明度
+     * @param bgAlpha
+     */
+    public void backgroundAlpha(float bgAlpha)
+    {
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.alpha = bgAlpha; //0.0-1.0
+        getWindow().setAttributes(lp);
+    }
+    /**
+     * 菜单弹出方向
+     *
+     */
+    public enum Location {
+
+        LEFT,
+        RIGHT,
+        TOP,
+        BOTTOM;
+
+    }
 
 
 }
