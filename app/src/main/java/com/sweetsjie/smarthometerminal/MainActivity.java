@@ -154,17 +154,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.connect:
                 sendCmd("isReady?");
 
-                while (true){
-                    if (result.equals("ready")) {
-                        Toast.makeText(MainActivity.this,"连接控制终端成功",Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                    try {
-                        sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+//                while (true){
+//                    if (result.equals("ready")) {
+//                        Toast.makeText(MainActivity.this,"连接控制终端成功",Toast.LENGTH_SHORT).show();
+//                        break;
+//                    }
+//                    try {
+//                        sleep(500);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
                 dialog.dismiss();
         }
     }
@@ -245,4 +245,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             show.setText(result);
         }
     };
+
+
+
 }
