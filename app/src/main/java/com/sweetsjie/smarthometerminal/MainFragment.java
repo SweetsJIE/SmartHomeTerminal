@@ -75,19 +75,19 @@ public class MainFragment extends Fragment {
             weatherImage.setImageResource(R.mipmap.qingtian);
     }
 
-    public void setTodayTempTV(CharSequence text) {
-        this.todayTempTV.setText(text);
+    public void setTodayTempTV(String string) {
+        this.todayTempTV.setText(string);
     }
 
-    public void setTodayWeatherTv(CharSequence text) {
-        this.todayWeatherTv.setText(text);
+    public void setTodayWeatherTv(String string) {
+        this.todayWeatherTv.setText(string);
     }
 
-    public void setTomorrowTempTv(CharSequence text) {
-        this.tomorrowTempTv.setText(text);
+    public void setTomorrowTempTv(String string) {
+        this.tomorrowTempTv.setText(string);
     }
 
-    public void setTomorrowWeatherTv(CharSequence text) {
-        this.tomorrowWeatherTv.setText(text);
+    public void setTomorrowWeatherTv(String string) {
+        this.tomorrowWeatherTv.setText(string);
     }
 }

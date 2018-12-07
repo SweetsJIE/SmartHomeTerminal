@@ -65,6 +65,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton menuBt;
 
     private JSONObject jsonObject;
+    private String basehtml;
+    private String allhtml;
+    String province;
+    String city;
+    String weather;
+    String temperature;
+    String windpower;
+    String humidity;
+    String reporttime;
+    String todayWeather;
+    String todayTemperature;
+    String tomorrowWeather;
+    String tomorrowTemperature;
 
     public String result = "";
     private PopupWindow popupWindow;
@@ -246,62 +259,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void run() {
             try {
                 //获取html返回json
-                String html = getHtml("https://restapi.amap.com/v3/weather/weatherInfo?key=0952ef14a2bac9fcdfab732cf9f8bc48&city=440113&extensions=base");
+                basehtml = getHtml("https://restapi.amap.com/v3/weather/weatherInfo?key=0952ef14a2bac9fcdfab732cf9f8bc48&city=440113&extensions=base");
+
                 //json解析
-                jsonObject = new JSONObject(html);
-                html = jsonObject.optString("lives");
+                jsonObject = new JSONObject(basehtml);
+                basehtml = jsonObject.optString("lives");
                 //字符串去头去尾  []
-                html = html.substring(1,html.length()-1);
+                basehtml = basehtml.substring(1,basehtml.length()-1);
                 //json解析
-                jsonObject = new JSONObject(html);
-                String province = jsonObject.optString("province");
-                String city = jsonObject.optString("city");
-                String weather = jsonObject.optString("weather");
-                String temperature = jsonObject.optString("temperature");
-                String windpower = jsonObject.optString("windpower");
-                String humidity = jsonObject.optString("humidity");
-                String reporttime = jsonObject.optString("reporttime");
+                jsonObject = new JSONObject(basehtml);
+                province = jsonObject.optString("province");
+                city = jsonObject.optString("city");
+                weather = jsonObject.optString("weather");
+                temperature = jsonObject.optString("temperature");
+                windpower = jsonObject.optString("windpower");
+                humidity = jsonObject.optString("humidity");reporttime = jsonObject.optString("reporttime");
+                //更新今天的天气数据
+                handler.post(updateMainWeatherData);
 
-                mainFragment.setAddrTv(province+"省"+city);
-                mainFragment.setWeatherChineseTv(weather);
-                mainFragment.setCurrentTemTv(temperature+"°");
-                mainFragment.setWindDirTv(windpower.substring(1,windpower.length())+"级");
-                mainFragment.setHumTv(humidity+"%");
-                mainFragment.setWeatherImage(weather);
-
-
-                html = getHtml("https://restapi.amap.com/v3/weather/weatherInfo?key=0952ef14a2bac9fcdfab732cf9f8bc48&city=440113&extensions=all");
-                jsonObject = new JSONObject(html);
-                html = jsonObject.optString("forecasts");
-                html = html.substring(1,html.length()-1);
-                jsonObject = new JSONObject(html);
-                html = jsonObject.optString("casts");
-                html = html.substring(1,html.length()-1);
-
-
-
-                String[]  strs=html.split("\\}");
+                //获取未来三天的天气数据
+                allhtml = getHtml("https://restapi.amap.com/v3/weather/weatherInfo?key=0952ef14a2bac9fcdfab732cf9f8bc48&city=440113&extensions=all");
+                jsonObject = new JSONObject(allhtml);
+                allhtml = jsonObject.optString("forecasts");
+                allhtml = allhtml.substring(1,allhtml.length()-1);
+                jsonObject = new JSONObject(allhtml);
+                allhtml = jsonObject.optString("casts");
+                allhtml = allhtml.substring(1,allhtml.length()-1);
+                
+                String[]  strs=allhtml.split("\\}");
                 String today = strs[0] + "}";
                 String tomorrow = strs[1].substring(1,strs[1].length()) + "}";
-                String afterTomorrow = strs[2].substring(1,strs[2].length()) + "}";
-
-
-
-
-
+                //获取今天的天气数据
                 jsonObject = new JSONObject(today);
-                temperature = jsonObject.optString("daytemp")+"/"+jsonObject.optString("nighttemp")+"℃";
-                weather = jsonObject.optString("dayweather");
-                Log.v("html",weather);
-                mainFragment.todayWeatherTv.setText(weather);
-                mainFragment.todayTempTV.setText(temperature);
-
+                todayTemperature = jsonObject.optString("daytemp")+"/"+jsonObject.optString("nighttemp")+"℃";
+                todayWeather = jsonObject.optString("dayweather");
+                //获取明天的天气数据
                 jsonObject = new JSONObject(tomorrow);
-                temperature = jsonObject.optString("daytemp")+"/"+jsonObject.optString("nighttemp")+"℃";
-                weather = jsonObject.optString("dayweather");
-                Log.v("html",weather);
-                mainFragment.tomorrowWeatherTv.setText(weather);
-                mainFragment.tomorrowTempTv.setText(temperature);
+                tomorrowTemperature = jsonObject.optString("daytemp")+"/"+jsonObject.optString("nighttemp")+"℃";
+                tomorrowWeather = jsonObject.optString("dayweather");
+                //更新今天和明天的天气数据
+                handler.post(updateOtherWeatherData);
+
+
 
 
 
@@ -398,6 +397,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
+    // 构建Runnable对象，在runnable中更新界面
+    Runnable updateMainWeatherData = new Runnable() {
+        @Override
+        public void run() {
+            //更新天气数据
+
+            mainFragment.setAddrTv(province+"省"+city);
+            mainFragment.setWeatherChineseTv(weather);
+            mainFragment.setCurrentTemTv(temperature+"°");
+            mainFragment.setWindDirTv(windpower.substring(1,windpower.length())+"级");
+            mainFragment.setHumTv(humidity+"%");
+            mainFragment.setWeatherImage(weather);
+
+        }
+    };
+
+    // 构建Runnable对象，在runnable中更新界面
+    Runnable updateOtherWeatherData = new Runnable() {
+        @Override
+        public void run() {
+            //更新天气数据
+            mainFragment.setTodayWeatherTv(todayWeather);
+            mainFragment.setTodayTempTV(todayTemperature);
+            mainFragment.setTomorrowWeatherTv(tomorrowWeather);
+            mainFragment.setTomorrowTempTv(tomorrowTemperature);
+
+        }
+    };
+
+
+
 
 
 
@@ -405,11 +435,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void initPopupWindow(){
         final View popupWindowView = getLayoutInflater().inflate(R.layout.left_menu, null);
         //内容，高度，宽度
-//        if(Location.BOTTOM.ordinal() == from){
-//            popupWindow = new PopupWindow(popupWindowView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-//        }else{
-            popupWindow = new PopupWindow(popupWindowView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.FILL_PARENT, true);
-//        }
+
+        popupWindow = new PopupWindow(popupWindowView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.FILL_PARENT, true);
+
         //动画效果
         if(Location.LEFT.ordinal() == from) {
             popupWindow.setAnimationStyle(R.style.AnimationLeftFade);
@@ -479,38 +507,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        //about.setText("about");
-//        Button open = (Button)popupWindowView.findViewById(R.id.open);
-//        Button save = (Button)popupWindowView.findViewById(R.id.save);
-//        Button close = (Button)popupWindowView.findViewById(R.id.close);
 
-//
-//        open.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(context, "Open", Toast.LENGTH_LONG).show();
-//                popupWindow.dismiss();
-//            }
-//        });
-//
-//        save.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(context, "Open", Toast.LENGTH_LONG).show();
-//                popupWindow.dismiss();
-//            }
-//        });
-//
-//        close.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(context, "Open", Toast.LENGTH_LONG).show();
-//                popupWindow.dismiss();
-//            }
-//        });
     }
 
     /**
@@ -632,15 +629,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        }
     }
 
-    /**
-     * 清除掉所有的选中状态。
-     */
-    private void clearSelection() {
-//        aboutFragment.setBackgroundColor(0xffffffff);
-//        welcomeFragment.setBackgroundColor(0xffffffff);
-//        ledFragment.setBackgroundColor(0xffffffff);
-//        settingLayout.setBackgroundColor(0xffffffff);
-    }
+
 
     public static String getHtml(String path) throws Exception {
         URL url = new URL(path);
