@@ -5,10 +5,6 @@
     android:background="@drawable/drawable_background"
     android:orientation="vertical">
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="80dp" />
-
     <TextView
         android:id="@+id/textView7"
         android:layout_width="match_parent"

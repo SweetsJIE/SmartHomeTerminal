@@ -12,7 +12,9 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -28,9 +30,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.net.UnknownHostException;
 
 import static java.lang.Thread.sleep;
@@ -51,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton menuBt;
     private TextView    aboutTv;
 
+    private JSONObject jsonObject;
 
     public String result = "";
     private PopupWindow popupWindow;
@@ -62,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private View settingView;
     private View aboutView;
     AlertDialog dialog;
+    private WebView webView;    //声明WebView组件的对象
+
 
 
     private int localPort = 9000;  //本地端口
@@ -74,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private AboutFragment aboutFragment;
     private FragmentManager fragmentManager;
-    private WelcomeFragment welcomeFragment;
+    private MainFragment mainFragment;
     private LedFragment ledFragment;
     private MonitorFragment monitorFragment;
 
@@ -89,9 +106,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //隐藏标题栏以及状态栏
+        /**标题是属于View的，所以窗口所有的修饰部分被隐藏后标题依然有效,需要去掉标题**/
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+
 
 
         //窗口控件初始化
@@ -124,10 +143,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 //        aboutFragment = new AboutFragment();
-//        welcomeFragment = new WelcomeFragment();
+
 //        ledFragment = new LedFragment();
 //        monitorFragment = new MonitorFragment();
 
+
+        Thread a = new httpThread();
+        a.start();
 
 
         setTabSelection(Location.MAIN.ordinal());
@@ -228,6 +250,65 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public class httpThread extends Thread{
+        @Override
+        public void run() {
+            try {
+                //获取html返回json
+                String html = getHtml("https://restapi.amap.com/v3/weather/weatherInfo?key=0952ef14a2bac9fcdfab732cf9f8bc48&city=440113&extensions=base");
+                //json解析
+                jsonObject = new JSONObject(html);
+                html = jsonObject.optString("lives");
+                //字符串去头去尾  []
+                html = html.substring(1,html.length()-1);
+                //json解析
+                jsonObject = new JSONObject(html);
+                String province = jsonObject.optString("province");
+                String city = jsonObject.optString("city");
+                String weather = jsonObject.optString("weather");
+                String temperature = jsonObject.optString("temperature");
+                String windpower = jsonObject.optString("windpower");
+                String humidity = jsonObject.optString("humidity");
+                String reporttime = jsonObject.optString("reporttime");
+
+                mainFragment.setAddrTv(province+"省"+city);
+                mainFragment.setWeatherChineseTv(weather);
+                mainFragment.setCurrentTemTv(temperature+"°");
+                mainFragment.setWindDirTv(windpower.substring(1,windpower.length())+"级");
+                mainFragment.setHumTv(humidity+"%");
+                mainFragment.setWeatherImage(weather);
+
+
+                html = getHtml("https://restapi.amap.com/v3/weather/weatherInfo?key=0952ef14a2bac9fcdfab732cf9f8bc48&city=440113&extensions=all");
+                jsonObject = new JSONObject(html);
+                html = jsonObject.optString("forecasts");
+                html = html.substring(1,html.length()-1);
+                jsonObject = new JSONObject(html);
+                html = jsonObject.optString("casts");
+                html = html.substring(1,html.length()-1);
+
+
+
+                String[]  strs=html.split("\\}");
+                String today = strs[0] + "}";
+                String tomorrow = strs[1].substring(1,strs[1].length()) + "}";
+                String afterTomorrow = strs[2].substring(1,strs[2].length()) + "}";
+
+
+                Log.v("html",today);
+                Log.v("html",tomorrow);
+                Log.v("html",afterTomorrow);
+
+
+
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     //接收线程
     public class UdpReceiveThread extends Thread {
         private final String TAG = "UdpReceiveThread";
@@ -313,6 +394,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     };
+
+
 
 
 
@@ -435,13 +518,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         hideFragments(transaction);
         switch (index) {
             case 1:
-                if (welcomeFragment == null) {
+                if (mainFragment == null) {
                     // 如果MessageFragment为空，则创建一个并添加到界面上
-                    welcomeFragment = new WelcomeFragment();
-                    transaction.add(R.id.fragmentLayout, welcomeFragment);
+                    mainFragment = new MainFragment();
+                    transaction.add(R.id.fragmentLayout, mainFragment);
                 } else {
                     // 如果MessageFragment不为空，则直接将它显示出来
-                    transaction.show(welcomeFragment);
+                    transaction.show(mainFragment);
                 }
                 break;
             case 2:
@@ -524,8 +607,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (aboutFragment != null) {
             transaction.hide(aboutFragment);
         }
-        if (welcomeFragment != null) {
-            transaction.hide(welcomeFragment);
+        if (mainFragment != null) {
+            transaction.hide(mainFragment);
         }
         if (ledFragment != null) {
             transaction.hide(ledFragment);
@@ -548,7 +631,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        settingLayout.setBackgroundColor(0xffffffff);
     }
 
-
+    public static String getHtml(String path) throws Exception {
+        URL url = new URL(path);
+        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setConnectTimeout(5 * 1000);
+        InputStream inStream = conn.getInputStream();//通过输入流获取html数据
+        byte[] data = readInputStream(inStream);//得到html的二进制数据
+        String html = new String(data, "UTF-8");
+        return html;
+    }
+    public static byte[] readInputStream(InputStream inStream) throws Exception{
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len = 0;
+        while( (len=inStream.read(buffer)) != -1 ){
+            outStream.write(buffer, 0, len);
+        }
+        inStream.close();
+        return outStream.toByteArray();
+    }
 
 
 
