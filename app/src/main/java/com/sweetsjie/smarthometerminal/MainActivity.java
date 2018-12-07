@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView    show;
     private ImageButton settingsBt;
     private ImageButton menuBt;
-    private TextView    aboutTv;
 
     private JSONObject jsonObject;
 
@@ -75,9 +74,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private AlertDialog.Builder builder;
     private View settingView;
-    private View aboutView;
     AlertDialog dialog;
-    private WebView webView;    //声明WebView组件的对象
 
 
 
@@ -125,13 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //fragment管理器初始化
         fragmentManager = getSupportFragmentManager();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setTabSelection(Location.MAIN.ordinal());
-            }
-        });
+
 
         ip = settingView.findViewById(R.id.ip);
         inputRomotePort = settingView.findViewById(R.id.targetPort);
@@ -295,10 +286,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String afterTomorrow = strs[2].substring(1,strs[2].length()) + "}";
 
 
-                Log.v("html",today);
-                Log.v("html",tomorrow);
-                Log.v("html",afterTomorrow);
 
+
+
+                jsonObject = new JSONObject(today);
+                temperature = jsonObject.optString("daytemp")+"/"+jsonObject.optString("nighttemp")+"℃";
+                weather = jsonObject.optString("dayweather");
+                Log.v("html",weather);
+                mainFragment.todayWeatherTv.setText(weather);
+                mainFragment.todayTempTV.setText(temperature);
+
+                jsonObject = new JSONObject(tomorrow);
+                temperature = jsonObject.optString("daytemp")+"/"+jsonObject.optString("nighttemp")+"℃";
+                weather = jsonObject.optString("dayweather");
+                Log.v("html",weather);
+                mainFragment.tomorrowWeatherTv.setText(weather);
+                mainFragment.tomorrowTempTv.setText(temperature);
 
 
 
@@ -445,6 +448,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TextView about = popupWindowView.findViewById(R.id.aboutTv);
         TextView led = popupWindowView.findViewById(R.id.ledTv);
         TextView monitor = popupWindowView.findViewById(R.id.monitorTv);
+        TextView main = popupWindowView.findViewById(R.id.mainFragmentTv);
 
         about.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -464,6 +468,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 setTabSelection(Location.MONITOR.ordinal());
+                popupWindow.dismiss();
+            }
+        });
+        main.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTabSelection(Location.MAIN.ordinal());
                 popupWindow.dismiss();
             }
         });

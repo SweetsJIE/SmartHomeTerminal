@@ -18,6 +18,10 @@ public class MainFragment extends Fragment {
     private TextView humTv;
     private TextView addrTv;
     private ImageView weatherImage;
+    public TextView todayTempTV;
+    public TextView todayWeatherTv;
+    public TextView tomorrowTempTv;
+    public TextView tomorrowWeatherTv;
 
 
 
@@ -36,6 +40,10 @@ public class MainFragment extends Fragment {
         humTv = mainFragment.findViewById(R.id.humTv);
         addrTv = mainFragment.findViewById(R.id.addrTv);
         weatherImage = mainFragment.findViewById(R.id.weatherImage);
+        todayTempTV = mainFragment.findViewById(R.id.todayTempTV);
+        todayWeatherTv = mainFragment.findViewById(R.id.todayWeatherTv);
+        tomorrowTempTv = mainFragment.findViewById(R.id.tomorrowTempTv);
+        tomorrowWeatherTv = mainFragment.findViewById(R.id.tomorrowWeatherTv);
 
         super.onStart();
     }
@@ -65,5 +73,21 @@ public class MainFragment extends Fragment {
             weatherImage.setImageResource(R.mipmap.yintian);
         if(string.equals("晴天"))
             weatherImage.setImageResource(R.mipmap.qingtian);
+    }
+
+    public void setTodayTempTV(CharSequence text) {
+        this.todayTempTV.setText(text);
+    }
+
+    public void setTodayWeatherTv(CharSequence text) {
+        this.todayWeatherTv.setText(text);
+    }
+
+    public void setTomorrowTempTv(CharSequence text) {
+        this.tomorrowTempTv.setText(text);
+    }
+
+    public void setTomorrowWeatherTv(CharSequence text) {
+        this.tomorrowWeatherTv.setText(text);
     }
 }

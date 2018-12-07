@@ -128,13 +128,17 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="300dp" />
+        android:layout_height="330dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
         android:orientation="horizontal">
+
+        <Space
+            android:layout_width="20dp"
+            android:layout_height="wrap_content" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -147,34 +151,23 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
                 <TextView
                     android:id="@+id/textView11"
-                    android:layout_width="wrap_content"
+                    android:layout_width="60dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="今天" />
-
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:text="今天"
+                    android:textColor="@color/color_white"
+                    android:textSize="15sp" />
 
                 <TextView
-                    android:id="@+id/textView12"
+                    android:id="@+id/todayTempTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="17/10℃" />
-
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:text="00/00℃"
+                    android:textColor="@color/color_white"
+                    android:textSize="15sp" />
 
             </LinearLayout>
 
@@ -188,34 +181,23 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
                 <TextView
-                    android:id="@+id/textView10"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/todayWeatherTv"
+                    android:layout_width="93dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="小雨" />
-
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:text="雨雨雨雨"
+                    android:textColor="@color/color_white"
+                    android:textSize="17sp" />
 
                 <TextView
                     android:id="@+id/textView3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="优" />
+                    android:background="@drawable/tv_background"
+                    android:text="  优  "
+                    android:textColor="@color/color_white"
+                    android:textSize="15sp" />
 
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
             </LinearLayout>
 
         </LinearLayout>
@@ -226,7 +208,7 @@
             android:layout_weight="1" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="127dp"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:layout_weight="1"
@@ -237,31 +219,24 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
                 <TextView
                     android:id="@+id/textView15"
-                    android:layout_width="wrap_content"
+                    android:layout_width="53dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="明天" />
-
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:text="明天"
+                    android:textColor="@color/color_white"
+                    android:textSize="15sp" />
 
                 <TextView
-                    android:id="@+id/textView14"
+                    android:id="@+id/tomorrowTempTv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="18/5℃" />
+                    android:text="00/00℃"
+                    android:textColor="@color/color_white"
+                    android:textSize="15sp" />
 
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <Space
@@ -273,27 +248,22 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
                 <TextView
-                    android:id="@+id/textView8"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tomorrowWeatherTv"
+                    android:layout_width="95dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="大雨" />
-
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:text="雨雨雨雨"
+                    android:textColor="@color/color_white"
+                    android:textSize="17sp" />
 
                 <TextView
                     android:id="@+id/textView13"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="优" />
+                    android:background="@drawable/tv_background"
+                    android:text="  优  "
+                    android:textColor="@color/color_white"
+                    android:textSize="15sp" />
 
             </LinearLayout>
 
