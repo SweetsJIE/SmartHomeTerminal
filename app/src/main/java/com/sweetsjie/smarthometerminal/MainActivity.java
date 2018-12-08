@@ -237,17 +237,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.connect:
                 sendCmd("isReady?");
 
-//                while (true){
-//                    if (result.equals("ready")) {
-//                        Toast.makeText(MainActivity.this,"连接控制终端成功",Toast.LENGTH_SHORT).show();
-//                        break;
-//                    }
-//                    try {
-//                        sleep(500);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
+                while (true){
+                    if (result.equals("ready")) {
+                        Toast.makeText(MainActivity.this,"连接控制终端成功",Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                    try {
+                        sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
                 dialog.dismiss();
                 break;
 
@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 jsonObject = new JSONObject(allhtml);
                 allhtml = jsonObject.optString("casts");
                 allhtml = allhtml.substring(1,allhtml.length()-1);
-                
+
                 String[]  strs=allhtml.split("\\}");
                 String today = strs[0] + "}";
                 String tomorrow = strs[1].substring(1,strs[1].length()) + "}";

@@ -5,32 +5,10 @@
     android:layout_height="match_parent"
     android:background="#262a32">
 
-    <RelativeLayout
-        android:id="@+id/rl_top"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#363a45">
-
-        <TextView
-            android:id="@+id/about_title"
-            android:layout_width="wrap_content"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center"
-            android:elevation="8dp"
-            android:gravity="center"
-            android:text="About"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </RelativeLayout>
-
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rl_top"
         android:padding="16dp"
         android:text="智能家居控制系统 Designed by ZhongWeiJie"
         android:textColor="@android:color/white"
